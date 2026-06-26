@@ -27,5 +27,5 @@ The dataset used for training the model consists of plant leaf images of differe
 ## Installation
 
 1. Clone the repository:
-```bash
+'''bash
 git clone <repository-link>
