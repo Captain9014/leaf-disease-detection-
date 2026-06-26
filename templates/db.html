@@ -1,0 +1,18 @@
+// JOIN QUERRY //
+SELECT prediction.id,
+       user.username,
+       prediction.disease,
+       prediction.confidence,
+       prediction.date
+FROM prediction
+JOIN user
+ON prediction.user_id = user.id;
+
+
+
+// ONLY FOR USER TABLE //
+SELECT * FROM user;
+
+
+// ONLY FOR PREDICTION TABLE //
+SELECT * FROM 'prediction';

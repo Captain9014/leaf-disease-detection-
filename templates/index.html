@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Multi Crop Disease Detection</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background:url("{{ url_for('static', filename='bg.jpg') }}") no-repeat center center/cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 360px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            color: white;
+        }
+
+        h1 {
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+
+        input[type="file"] {
+            margin: 15px 0;
+            padding: 5px;
+            width: 100%;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button {
+            background: #2ecc71;
+            border: none;
+            padding: 10px 25px;
+            color: white;
+            font-size: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #27ae60;
+        }
+
+        img {
+            margin-top: 10px;
+            width: 180px;
+            border-radius: 10px;
+        }
+
+        .logout {
+            float: right;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .result-card {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            text-align: left;
+        }
+
+        .history {
+            margin-top: 20px;
+            background: white;
+            color: black;
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 6px;
+            font-size: 13px;
+        }
+
+        th {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #2ecc71;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            animation: spin 1s linear infinite;
+            margin: 15px auto;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        #loading {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <a class="logout" href="/logout">Logout</a>
+
+        <h1>🌿 Multi Crop Disease Detection</h1>
+
+        <form id="predict-form" action="/predict" method="post" enctype="multipart/form-data">
+
+            <input type="file" name="file" accept="image/*" onchange="previewImage(event)" required>
+
+            <br>
+
+            <!-- Image Preview -->
+            <img id="preview" style="display:none;">
+
+            <br><br>
+
+            <button type="submit">Predict Disease</button>
+
+        </form>
+
+
+        <!-- Loading -->
+        <div id="loading">
+            <div class="spinner"></div>
+            <p>Predicting... Please wait</p>
+        </div>
+
+
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+
+
+        {% if crop %}
+        <div class="result-card">
+
+            <h3>🌿 {{ crop }}</h3>
+
+            <p><strong>🩺 Condition:</strong> {{ condition }}</p>
+
+            <p><strong>📊 Confidence:</strong> {{ confidence }}%</p>
+
+            {% if info %}
+
+            <div class="info-box">
+
+                <h4>📖 Description</h4>
+                <p>{{ info.description }}</p>
+
+                <h4>🔍 Symptoms</h4>
+                <p>{{ info.symptoms }}</p>
+
+                <h4>💊 Treatment</h4>
+                <p>{{ info.treatment }}</p>
+
+                <h4>🛡 Prevention</h4>
+                <p>{{ info.prevention }}</p>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+        {% endif %}
+
+
+        <!-- Prediction History -->
+
+        {% if history %}
+
+        <div class="history">
+
+            <h3>📊 Prediction History</h3>
+
+            <table>
+
+                <tr>
+                    <th>Disease</th>
+                    <th>Confidence</th>
+                </tr>
+
+                {% for h in history %}
+
+                <tr>
+                    <td>{{ h.disease }}</td>
+                    <td>{{ h.confidence }}%</td>
+                </tr>
+
+                {% endfor %}
+
+            </table>
+
+        </div>
+
+        {% endif %}
+
+
+    </div>
+
+
+    <script>
+
+        function previewImage(event) {
+
+            var reader = new FileReader();
+
+            reader.onload = function () {
+
+                var output = document.getElementById('preview');
+
+                output.src = reader.result;
+
+                output.style.display = "block";
+
+            }
+
+            reader.readAsDataURL(event.target.files[0]);
+
+        }
+
+
+        const form = document.getElementById("predict-form");
+
+        const loading = document.getElementById("loading");
+
+        form.addEventListener("submit", function () {
+
+            loading.style.display = "block";
+
+            form.querySelector("button").disabled = true;
+
+        });
+
+    </script>
+
+</body>
+
+</html>
